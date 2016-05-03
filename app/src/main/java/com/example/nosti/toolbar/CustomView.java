@@ -51,15 +51,18 @@ public class CustomView extends View {
     public void setBitmap(Bitmap bitmap)
     {
         this.bitmap = bitmap;
-        invalidate();
+        Log.d("Main", "setBitMap");
+        //invalidate();
+        requestLayout();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        Log.d("Main", "onDraw");
         if (bitmap != null) {
             canvas.drawBitmap(bitmap, srcRect, imgRect, paint);
+            Log.d("Main", "Drawing");
         }
 
         paint.setColor(Color.BLACK);
@@ -77,7 +80,7 @@ public class CustomView extends View {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-
+        Log.d("Main", "onLayout");
         width = getWidth();
         height = getHeight();
 

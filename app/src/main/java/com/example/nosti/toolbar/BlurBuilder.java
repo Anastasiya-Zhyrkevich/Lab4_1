@@ -8,8 +8,6 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 
 
-
-
 /**
  * Created by nosti on 4/25/2016.
  */

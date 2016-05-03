@@ -1,5 +1,9 @@
 package com.example.nosti.toolbar;
 
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v8.renderscript.*;
 
 import android.graphics.Bitmap;
@@ -25,20 +29,31 @@ public class MainActivity extends AppCompatActivity {
     int[] curProgress;
     private int indexProgress;
 
+    private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ex);
+    private void initDecoration(Bitmap newBitmap){
+        Log.d("Main", "initDecor");
+        bitmap =  newBitmap.copy(newBitmap.getConfig(), true);
         indexProgress = 1;
         curProgress = new int[3];
         for (int i= 0; i<3; i++)
             curProgress[i] = 0;
         curProgress[2] = 12;
+        customView.setBitmap(bitmap);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log.d("Main", "OnCreate");
+        super.onCreate(savedInstanceState);
+        Log.d("Main", "OnCreateSuper");
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+        //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ex);
+
 
         customView = (CustomView) findViewById(R.id.custom_view);
         customView.setBitmap(bitmap);
@@ -135,10 +150,42 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.load) {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, SELECT_PICTURE_ACTIVITY_REQUEST_CODE);
+            Log.d("Load", "endLoad");
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        switch (requestCode) {
+            case SELECT_PICTURE_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String filePath = cursor.getString(columnIndex);
+                        Bitmap newBitmap = BitmapFactory.decodeFile(filePath);
+                        if (newBitmap == null)
+                        {
+                            Log.d("Main", "nullBitmap");
+                        }
+                        Log.d("Main", "newBitMap");
+                        initDecoration(newBitmap);
+
+                    }
+                    cursor.close();
+                }
+                break;
+        }
     }
 }
