@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Toolbar</string>
+    <string name="action_settings">Settings</string>
+    <string name="extract">extract</string>
+    <string name="blur">blur</string>
+    <string name="bright">brightness</string>
+    <string name="load">Load Image</string>
+    <string name="save">Save Image</string>
+</resources>
