@@ -195,11 +195,11 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
             {
                 Log.d("Main", "Nullostream");
             }
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+            performTranformation(bitmap).compress(Bitmap.CompressFormat.JPEG, 100, ostream);
             ostream.flush();
             ostream.close();
             Log.d("Main", "Saved");
-            customView.setBitmap(bitmap, file.toString());
+            customView.setBitmap(performTranformation(bitmap), file.toString());
             showVerdictSaving(getResources().getString(R.string.saved_good), getResources().getString(R.string.ok));
         }
         catch (Exception e) {
