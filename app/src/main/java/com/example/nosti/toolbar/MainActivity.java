@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
     private static final String INVALIDE_FILENAME = "Invalide_filename";
     private static final String EXISTED_FILENAME = "Existed_filename";
 
-    private void initDecoration(Bitmap newBitmap) {
+    private void initDecoration(Bitmap newBitmap, String file) {
         Log.d("Main", "initDecor");
         bitmap =  newBitmap.copy(newBitmap.getConfig(), true);
         indexProgress = 1;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
         for (int i= 0; i<3; i++)
             curProgress[i] = 0;
         curProgress[2] = 12;
-        customView.setBitmap(bitmap);
+        customView.setBitmap(bitmap, file);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
         setSupportActionBar(toolbar);
 
 
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ex);
+        //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ex);
 
 
         customView = (CustomView) findViewById(R.id.custom_view);
@@ -191,10 +191,15 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
                 file.delete();
             }
             FileOutputStream ostream = new FileOutputStream(file);
+            if (ostream == null)
+            {
+                Log.d("Main", "Nullostream");
+            }
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
             ostream.flush();
             ostream.close();
             Log.d("Main", "Saved");
+            customView.setBitmap(bitmap, filename);
             showVerdictSaving(getResources().getString(R.string.saved_good), getResources().getString(R.string.ok));
         }
         catch (Exception e) {
@@ -255,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
                             Log.d("Main", "nullBitmap");
                         }
                         Log.d("Main", "newBitMap");
-                        initDecoration(newBitmap);
+                        initDecoration(newBitmap, filePath);
 
                     }
                     cursor.close();

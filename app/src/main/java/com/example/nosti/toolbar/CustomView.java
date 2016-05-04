@@ -23,6 +23,7 @@ public class CustomView extends View {
     private Rect imgRect;
     private int width;
     private int height;
+    private String text;
 
     public CustomView(Context context) {
         super(context);
@@ -41,11 +42,21 @@ public class CustomView extends View {
 
     private void init(Context context){
         paint = new Paint();
+        text = "Hello";
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ex);
         //srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         srcRect = null;
         dstRect = new Rect();
         imgRect = new Rect();
+    }
+
+    public void setBitmap(Bitmap bitmap, String file)
+    {
+        this.bitmap = bitmap;
+        this.text = file;
+        Log.d("Main", "setBitMap");
+        //invalidate();
+        requestLayout();
     }
 
     public void setBitmap(Bitmap bitmap)
@@ -63,14 +74,12 @@ public class CustomView extends View {
         if (bitmap != null) {
             canvas.drawBitmap(bitmap, srcRect, imgRect, paint);
             Log.d("Main", "Drawing");
+
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(20);
+            float padding = dstRect.height() * (float)0.1;
+            canvas.drawText(text, getWidth() - dstRect.width() - padding, imgRect.height() + dstRect.height() + padding, paint);
         }
-
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(100);
-
-        /*String text = "Hello";
-        paint.getTextBounds(text, 0, text.length(), dstRect);
-        canvas.drawText("Hello", getWidth() - dstRect.width(), 20,  paint);*/
     }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -85,6 +94,9 @@ public class CustomView extends View {
         height = getHeight();
 
         if (bitmap != null) {
+            paint.getTextBounds(text, 0, text.length(), dstRect);
+            double padding = dstRect.height() * 0.1;
+            height -= dstRect.height() + padding;
             double scale = Math.min(1.0 * width / bitmap.getWidth(), 1.0 * height / bitmap.getHeight());
             imgRect.set(0, 0, (int) (scale * bitmap.getWidth()), (int) (scale * bitmap.getHeight()));
         }
