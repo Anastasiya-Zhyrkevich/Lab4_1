@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
 
     private static final String INVALIDE_FILENAME = "Invalide_filename";
     private static final String EXISTED_FILENAME = "Existed_filename";
+    private static final String NOTHING_TO_SAVE = "Nothing to save";
 
     private void initDecoration(Bitmap newBitmap, String file) {
         Log.d("Main", "initDecor");
@@ -183,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
     public void onFinishEditDialog(String filename)
     {
         try {
+            if (bitmap == null)
+                throw new IOException(NOTHING_TO_SAVE);
             Log.d("Main", filename);
             if (filename.equals(""))
                 throw new IOException(INVALIDE_FILENAME);
@@ -206,6 +209,10 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
             switch (e.getMessage()) {
                 case INVALIDE_FILENAME:
                     showVerdictSaving(getResources().getString(R.string.invalide_filename),
+                            getResources().getString(R.string.ok));
+                    break;
+                case NOTHING_TO_SAVE:
+                    showVerdictSaving(getResources().getString(R.string.no_image),
                             getResources().getString(R.string.ok));
                     break;
                 default:

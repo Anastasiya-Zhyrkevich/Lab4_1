@@ -11,5 +11,6 @@
     <string name="invalide_filename">Invalide filename</string>
     <string name="existed_filename"> File with such a name already exists</string>
     <string name="saved_bad">Something goes wrong. Saved unsuccessfully</string>
+    <string name="no_image">There is no image to save</string>
 
 </resources>
