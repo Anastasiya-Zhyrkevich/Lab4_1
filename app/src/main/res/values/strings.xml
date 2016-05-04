@@ -6,4 +6,10 @@
     <string name="bright">brightness</string>
     <string name="load">Load Image</string>
     <string name="save">Save Image</string>
+    <string name="ok">Ok</string>
+    <string name="saved_good">Saved successfully</string>
+    <string name="invalide_filename">Invalide filename</string>
+    <string name="existed_filename"> File with such a name already exists</string>
+    <string name="saved_bad">Something goes wrong. Saved unsuccessfully</string>
+
 </resources>
