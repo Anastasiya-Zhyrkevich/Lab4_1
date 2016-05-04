@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
             ostream.flush();
             ostream.close();
             Log.d("Main", "Saved");
-            customView.setBitmap(bitmap, filename);
+            customView.setBitmap(bitmap, file.toString());
             showVerdictSaving(getResources().getString(R.string.saved_good), getResources().getString(R.string.ok));
         }
         catch (Exception e) {

@@ -37,7 +37,7 @@ public class EditNameDialog extends DialogFragment implements TextView.OnEditorA
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_name, container);
         mEditText = (EditText) view.findViewById(R.id.txt_your_name);
-        getDialog().setTitle("Hello");
+        getDialog().setTitle("Enter file name, please");
 
         // Show soft keyboard automatically
         mEditText.requestFocus();
