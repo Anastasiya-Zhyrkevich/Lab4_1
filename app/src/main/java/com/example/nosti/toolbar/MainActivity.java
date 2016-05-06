@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
     private static final String EXISTED_FILENAME = "Existed_filename";
     private static final String NOTHING_TO_SAVE = "Nothing to save";
 
+    String position1;
+    String position2;
+
     private void initDecoration(Bitmap newBitmap, String file) {
         Log.d("Main", "initDecor");
         bitmap =  newBitmap.copy(newBitmap.getConfig(), true);
@@ -55,7 +59,31 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
         for (int i= 0; i<3; i++)
             curProgress[i] = 0;
         curProgress[2] = 12;
-        customView.setBitmap(bitmap, file);
+        position1 = "";
+        position2 = "";
+        try {
+            ExifInterface exif = new ExifInterface(file);
+            position1 = convertLatLon(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+            position2 = convertLatLon(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("Main", "lat" + position1 + "lon" + position2);
+        customView.setBitmap(bitmap, "lat : " + position1 + ", lon : " + position2);
+        initSeekBar();
+    }
+
+    private void initSeekBar() {
+        seekBar.setEnabled(true);
+        seekBar.setProgress(curProgress[indexProgress]);
+    }
+    private String convertLatLon(String position){
+        if (position == null)
+            return "Unknown";
+        String[] parts = position.split("/");
+        return parts[0];
     }
 
     @Override
@@ -67,9 +95,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ex);
-
 
         customView = (CustomView) findViewById(R.id.custom_view);
         customView.setBitmap(bitmap);
@@ -88,11 +114,12 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
 
 
         seekBar = (SeekBar) findViewById(R.id.seek_bar);
+        seekBar.setEnabled(false);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Log.d("Progress", "" + progress);
-                if (fromUser) {
+                if (fromUser && bitmap != null) {
                     Bitmap copyBit = bitmap.copy(bitmap.getConfig(), true);
                     curProgress[indexProgress] = progress;
                     Bitmap blurredBitmap = performTranformation(copyBit);
@@ -118,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (bitmap == null) return;
                 // TODO Auto-generated method stub
                 switch (checkedId) {
                     case R.id.radio_blur:
@@ -145,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
 
     private Bitmap performTranformation(Bitmap image)
     {
+        if (image == null) return null;
         Bitmap blurredBitmap = BlurBuilder.blur(MainActivity.this, image, (float)1.0 * curProgress[1] + 1);
         blurredBitmap = BrightBuilder.blur(MainActivity.this, blurredBitmap, curProgress[0]);
         blurredBitmap = ExtractBuilder.blur(MainActivity.this, blurredBitmap, curProgress[2]);
@@ -203,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
             ostream.close();
             Log.d("Main", "Saved");
             customView.setBitmap(performTranformation(bitmap), file.toString());
+            galleryAddPic(file.toString());
             showVerdictSaving(getResources().getString(R.string.saved_good), getResources().getString(R.string.ok));
         }
         catch (Exception e) {
@@ -223,6 +253,15 @@ public class MainActivity extends AppCompatActivity implements EditNameDialog.Ed
             }
         }
     }
+
+    private void galleryAddPic(String mCurrentPhotoPath) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
     private void showVerdictSaving(final CharSequence message, final CharSequence button){
         DialogFragment df = new DialogFragment () {
             @Override
